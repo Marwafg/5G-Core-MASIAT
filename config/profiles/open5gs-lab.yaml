@@ -1,0 +1,21 @@
+name: open5gs-lab
+base_url: http://open5gs-core.local
+description: Profile describing an Open5GS-style microservice API lab.
+scope: Open5GS Docker or VM lab
+simulate: true
+rate_limit_per_second: 1.5
+timeout_seconds: 8.0
+concurrency: 2
+headers:
+  x-api-key: 5GC-SECURE-2026
+endpoints:
+  - nf: nrf
+    method: GET
+    path: /nnrf-nfm/v1/nf-instances
+    description: Registry-style network function endpoint
+    scopes: [nnrf-disc]
+  - nf: udm
+    method: GET
+    path: /nudm-sdm/v2/{supi}/am-data
+    description: Subscriber identity and mobility data endpoint
+    scopes: [nudm-sdm]

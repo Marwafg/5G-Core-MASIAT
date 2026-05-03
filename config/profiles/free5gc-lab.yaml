@@ -1,0 +1,21 @@
+name: free5gc-lab
+base_url: http://free5gc-nrf.local
+description: Profile describing a free5GC-style lab with OpenAPI-driven endpoint discovery.
+scope: free5GC Kubernetes or Docker lab
+simulate: true
+rate_limit_per_second: 1.5
+timeout_seconds: 8.0
+concurrency: 2
+headers:
+  x-api-key: 5GC-SECURE-2026
+endpoints:
+  - nf: nrf
+    method: GET
+    path: /nnrf-nfm/v1/nf-instances
+    description: NF discovery endpoint
+    scopes: [nnrf-disc]
+  - nf: udm
+    method: GET
+    path: /nudm-sdm/v2/{supi}/am-data
+    description: Subscriber data endpoint
+    scopes: [nudm-sdm]

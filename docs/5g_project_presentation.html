@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>5G Core Microservice API Security and Injection Attack Tester</title>
+  <style>
+    :root {
+      --bg: #09070f;
+      --shell: #13101b;
+      --panel: #181320;
+      --panel-soft: #20182b;
+      --line: rgba(255, 255, 255, 0.08);
+      --text: #f5efff;
+      --muted: #b8aecf;
+      --purple: #ca72f2;
+      --blue: #79d8ff;
+      --orange: #ff9c5b;
+      --green: #7ee39a;
+      --red: #ff7e89;
+      --shadow: 0 28px 80px rgba(0, 0, 0, 0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background:
+        radial-gradient(circle at top, rgba(202, 114, 242, 0.22), transparent 18%),
+        linear-gradient(180deg, #231c2e 0%, #09070f 100%);
+      color: var(--text);
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      padding: 22px;
+    }
+
+    .deck {
+      width: min(1320px, 100%);
+      margin: 0 auto;
+    }
+
+    .toolbar {
+      position: sticky;
+      top: 10px;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 18px;
+      margin-bottom: 18px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(12, 8, 18, 0.86);
+      backdrop-filter: blur(12px);
+    }
+
+    .toolbar strong {
+      display: block;
+      font-size: 1rem;
+    }
+
+    .toolbar span {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    button {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      color: var(--text);
+      border-radius: 999px;
+      padding: 10px 16px;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    button:hover {
+      border-color: rgba(202, 114, 242, 0.45);
+    }
+
+    .progress {
+      min-width: 110px;
+      text-align: right;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .slide {
+      display: none;
+      min-height: calc(100vh - 128px);
+      padding: 34px;
+      border-radius: 28px;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.03), transparent 18%),
+        var(--shell);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .slide.active {
+      display: grid;
+    }
+
+    .slide::after {
+      content: "";
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      right: -40px;
+      bottom: -40px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(121, 216, 255, 0.17), transparent 68%);
+      pointer-events: none;
+    }
+
+    .hero {
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 18px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(202, 114, 242, 0.28);
+      background: rgba(202, 114, 242, 0.08);
+      color: #f3ddff;
+      font-size: 0.84rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    h1, h2, h3 {
+      margin: 0 0 14px;
+      line-height: 1.12;
+    }
+
+    h1 {
+      font-size: clamp(2.5rem, 5vw, 4.2rem);
+      max-width: 11ch;
+    }
+
+    h2 {
+      font-size: clamp(1.8rem, 3.6vw, 2.9rem);
+    }
+
+    h3 {
+      font-size: 1.08rem;
+      color: #f7eaff;
+    }
+
+    p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+
+    .lead {
+      font-size: 1.08rem;
+      max-width: 62ch;
+    }
+
+    .grid-2,
+    .grid-3,
+    .metrics,
+    .timeline,
+    .nf-grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .metrics {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .timeline {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin-top: 14px;
+    }
+
+    .nf-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin-top: 12px;
+    }
+
+    .card,
+    .metric,
+    .codebox,
+    .callout,
+    .node {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 18px;
+    }
+
+    .metric strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 1.7rem;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    ul, ol {
+      margin: 10px 0 0;
+      padding-left: 20px;
+    }
+
+    li {
+      margin-bottom: 10px;
+      line-height: 1.6;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .pill {
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.04);
+      color: #f2e8ff;
+      font-size: 0.9rem;
+    }
+
+    .accent {
+      color: var(--blue);
+    }
+
+    .good {
+      color: var(--green);
+    }
+
+    .bad {
+      color: var(--red);
+    }
+
+    .timeline .card {
+      position: relative;
+      min-height: 140px;
+    }
+
+    .timeline .card strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 1.1rem;
+      color: white;
+    }
+
+    .node {
+      text-align: center;
+      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+    }
+
+    .node strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .node span {
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: 1fr 70px 1fr 70px 1fr 70px 1fr;
+      gap: 10px;
+      align-items: center;
+      margin-top: 18px;
+    }
+
+    .arrow {
+      text-align: center;
+      font-size: 1.5rem;
+      color: var(--blue);
+      font-weight: 700;
+    }
+
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.65;
+      font-size: 0.95rem;
+      color: #f4effd;
+    }
+
+    .speaker {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border-left: 4px solid var(--purple);
+      background: rgba(202, 114, 242, 0.08);
+    }
+
+    .speaker strong {
+      display: block;
+      margin-bottom: 6px;
+      color: #f7dfff;
+    }
+
+    .footer-note {
+      margin-top: 16px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .kbd {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.05);
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 980px) {
+      body {
+        padding: 12px;
+      }
+
+      .slide,
+      .hero,
+      .grid-2,
+      .grid-3,
+      .metrics,
+      .timeline,
+      .nf-grid,
+      .flow {
+        grid-template-columns: 1fr;
+      }
+
+      .slide {
+        min-height: auto;
+        padding: 24px;
+      }
+
+      .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .progress {
+        text-align: left;
+      }
+
+      .arrow {
+        transform: rotate(90deg);
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+        color: black;
+        padding: 0;
+      }
+
+      .toolbar {
+        display: none;
+      }
+
+      .slide {
+        display: grid !important;
+        min-height: auto;
+        break-inside: avoid;
+        page-break-inside: avoid;
+        margin-bottom: 16px;
+        box-shadow: none;
+        background: white;
+        color: black;
+      }
+
+      p, .footer-note, .node span, .metric span {
+        color: #333;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="deck">
+    <div class="toolbar">
+      <div>
+        <strong>5G Core Microservice API Security and Injection Attack Tester</strong>
+        <span>Standalone presentation for the dashboard, scanner CLI, and 5G Core API security workflow.</span>
+      </div>
+      <div class="controls">
+        <button type="button" id="prevBtn">Previous</button>
+        <button type="button" id="nextBtn">Next</button>
+        <button type="button" id="printBtn">Print / PDF</button>
+      </div>
+      <div class="progress" id="progressText">Slide 1 / 16</div>
+    </div>
+
+    <section class="slide hero active">
+      <div>
+        <div class="eyebrow">Final Year Project</div>
+        <h1>5G Core Microservice API Security and Injection Attack Tester</h1>
+        <p class="lead">
+          A practical platform for demonstrating injection vulnerabilities and authorization flaws in 5G Core Service-Based Interfaces using a dashboard, scanner CLI, and OpenAPI-driven attack scenarios.
+        </p>
+        <div class="pill-row">
+          <span class="pill">5G Core</span>
+          <span class="pill">SBI APIs</span>
+          <span class="pill">OpenAPI</span>
+          <span class="pill">FastAPI Dashboard</span>
+          <span class="pill">Scanner CLI</span>
+        </div>
+        <div class="speaker">
+          <strong>Say this:</strong>
+          “I begin with the 5G context, then narrow the discussion to the 5G Core, the API attack surface, and finally the practical tester I built.”
+        </div>
+      </div>
+      <div class="callout">
+        <h3>Presentation logic</h3>
+        <p>We begin with telecom background, move inside the 5G Core, explain why APIs create risk, then present the platform that simulates those attacks in practice.</p>
+        <div class="metrics">
+          <div class="metric"><strong>16</strong><span>Slides</span></div>
+          <div class="metric"><strong>3</strong><span>Main NFs simulated</span></div>
+          <div class="metric"><strong>8+</strong><span>Attack vectors</span></div>
+          <div class="metric"><strong>2</strong><span>Interfaces: UI + CLI</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div>
+        <div class="eyebrow">Background</div>
+        <h2>What Is 5G?</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Definition</h3>
+            <p>
+              5G is the fifth generation of mobile networks. It enables communication with high speed, low latency, and massive connectivity between users, devices, and digital services.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Simple idea</h3>
+            <p>
+              It is not only for smartphones. 5G also connects cars, factories, homes, hospitals, and IoT systems to intelligent online services.
+            </p>
+          </div>
+        </div>
+        <div class="speaker">
+          <strong>Say this:</strong>
+          “Before talking about security, I first explain that 5G is not just faster internet for phones. It is an infrastructure for massive digital communication.”
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div>
+        <div class="eyebrow">Evolution</div>
+        <h2>From 2G to 5G</h2>
+        <div class="timeline">
+          <div class="card"><strong>2G</strong><p>Voice communication</p></div>
+          <div class="card"><strong>3G</strong><p>Mobile internet</p></div>
+          <div class="card"><strong>4G</strong><p>High-speed multimedia and data</p></div>
+          <div class="card"><strong>5G</strong><p>Massive connectivity, low latency, flexible services</p></div>
+        </div>
+        <div class="speaker">
+          <strong>Say this:</strong>
+          “5G is the continuation of mobile evolution, but it also changes the internal architecture of the network, which is why security becomes more software- and API-oriented.”
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div>
+        <div class="eyebrow">High-Level View</div>
+        <h2>How 5G Works</h2>
+        <div class="flow">
+          <div class="node"><strong>UE</strong><span>Smartphone, car, smart home, IoT device</span></div>
+          <div class="arrow">→</div>
+          <div class="node"><strong>gNB</strong><span>Base station / antenna</span></div>
+          <div class="arrow">→</div>
+          <div class="node"><strong>5G Core</strong><span>Central control and service layer</span></div>
+          <div class="arrow">→</div>
+          <div class="node"><strong>Internet</strong><span>External applications and digital services</span></div>
+        </div>
+        <div class="footer-note">All traffic and service logic passes through the 5G Core, which makes it a strategic security target.</div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div>
+        <div class="eyebrow">Core Focus</div>
+        <h2>What Is the 5G Core?</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Definition</h3>
+            <p>
+              The 5G Core is the central part of the network. It manages users, sessions, mobility, routing, authentication, and communication with external services.
+            </p>
+          </div>
+          <div class="card">
+            <h3>Where it is deployed</h3>
+            <p>
+              In real environments, the 5G Core is deployed in operator data centers, private cloud platforms, or public cloud infrastructure.
+            </p>
+          </div>
+        </div>
+        <div class="speaker">
+          <strong>Say this:</strong>
+          “My project focuses specifically on the 5G Core because that is where service logic and API communication happen.”
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div>
+        <div class="eyebrow">Inside the Core</div>
+        <h2>5G Core as Microservices</h2>
+        <p class="lead">
+          The 5G Core is not one monolithic system. It is composed of many independent Network Functions that behave like modern microservices and communicate through APIs.
+        </p>
+        <div class="nf-grid">
+          <div class="node"><strong>AMF</strong><span>User access and mobility</span></div>
+          <div class="node"><strong>SMF</strong><span>Session creation and control</span></div>
+          <div class="node"><strong>UPF</strong><span>User traffic forwarding</span></div>
+          <div class="node"><strong>NRF</strong><span>Service discovery registry</span></div>
+          <div class="node"><strong>AUSF</strong><span>Authentication</span></div>
+          <div class="node"><strong>UDM</strong><span>Subscriber data</span></div>
+          <div class="node"><strong>NSSF</strong><span>Network slice selection</span></div>
+          <div class="node"><strong>NEF</strong><span>Network exposure and diagnostics</span></div>
+        </div>
+        <div class="speaker">
+          <strong>Say this:</strong>
+          “This is the key transition point in the presentation: once we view the core as microservices, API security becomes essential.”
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div>
+        <div class="eyebrow">Interfaces</div>
+        <h2>Why Service-Based Interfaces Matter</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Service-Based Interfaces</h3>
+            <ul>
+              <li>Used between core functions</li>
+              <li>HTTP/2 + JSON APIs</li>
+              <li>Examples: Namf, Nsmf, Nudm, Nnrf</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Security consequence</h3>
+            <ul>
+              <li>Internal communication now looks like web API traffic</li>
+              <li>Input validation becomes critical</li>
+              <li>Authentication and authorization logic can be attacked</li>
+            </ul>
+          </div>
+        </div>
+        <div class="speaker">
+          <strong>Say this:</strong>
+          “The project is based on Service-Based Interfaces because they are the main API communication channels inside the 5G Core.”
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div>
+        <div class="eyebrow">Security Question</div>
+        <h2>Is 5G Secure by Default?</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Original assumption</h3>
+            <ul>
+              <li>Controlled telecom environments</li>
+              <li>Protected data centers</li>
+              <li>Strong network perimeter</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Modern reality</h3>
+            <ul>
+              <li>Cloud deployments</li>
+              <li>Private 5G networks</li>
+              <li>University labs and research setups</li>
+              <li>Open-source platforms such as free5GC and Open5GS</li>
+            </ul>
+          </div>
+        </div>
+        <div class="speaker">
+          <strong>Say this:</strong>
+          “The 5G Core was originally designed for a controlled environment, but modern deployment models make the perimeter weaker and the API attack surface more exposed.”
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div>
+        <div class="eyebrow">Attack Surface</div>
+        <h2>Why Could 5G Be Vulnerable?</h2>
+        <div class="grid-3">
+          <div class="card">
+            <h3>Microservices</h3>
+            <p>More services mean more internal communication paths and more code boundaries.</p>
+          </div>
+          <div class="card">
+            <h3>APIs</h3>
+            <p>Network Functions exchange data through API endpoints, request bodies, tokens, and identifiers.</p>
+          </div>
+          <div class="card">
+            <h3>Deployment risks</h3>
+            <p>Misconfiguration, weak validation, and limited telecom expertise can expose internal services.</p>
+          </div>
+        </div>
+        <div class="callout" style="margin-top:16px;">
+          <h3>Key idea</h3>
+          <p>More flexibility means a larger attack surface. Security now depends not only on design, but also on implementation and deployment.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div>
+        <div class="eyebrow">Threat Model</div>
+        <h2>What Can an Attacker Do?</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Potential attacker actions</h3>
+            <ul>
+              <li>Send malicious API requests</li>
+              <li>Exploit weak input validation</li>
+              <li>Try to impersonate a Network Function</li>
+              <li>Abuse object identifiers and service tokens</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Potential targets</h3>
+            <ul>
+              <li>Private 5G deployments</li>
+              <li>University labs and research environments</li>
+              <li>Cloud deployments with misconfiguration</li>
+              <li>Development and testing environments</li>
+            </ul>
+          </div>
+        </div>
+        <div class="speaker">
+          <strong>Say this:</strong>
+          “This is where I move from telecom explanation to security analysis: the attacker does not need to break radio first. Weak APIs inside the core can already become the entry point.”
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div>
+        <div class="eyebrow">From Theory to Practice</div>
+        <h2>Our Approach</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>Security workflow</h3>
+            <ul>
+              <li>Use an open-source 5G Core environment</li>
+              <li>Analyze API communication between functions</li>
+              <li>Simulate injection attack scenarios</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>My implementation</h3>
+            <ul>
+              <li>FastAPI dashboard for live demonstrations</li>
+              <li>Scanner CLI with modular checks and attacks</li>
+              <li>OpenAPI-driven payloads, evidence logging, and structured findings</li>
+            </ul>
+          </div>
+        </div>
+        <div class="speaker">
+          <strong>Say this:</strong>
+          “This is where the presentation moves from theory into practice: the platform turns telecom security concepts into concrete, testable attack scenarios.”
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div>
+        <div class="eyebrow">My Platform</div>
+        <h2>Project Architecture</h2>
+        <div class="flow">
+          <div class="node"><strong>Dashboard UI</strong><span>Interactive attack runner, findings, analysis</span></div>
+          <div class="arrow">→</div>
+          <div class="node"><strong>FastAPI Backend</strong><span>Routers, validation, security logic</span></div>
+          <div class="arrow">→</div>
+          <div class="node"><strong>Simulated NFs</strong><span>NRF, UDM, NEF behaviors</span></div>
+          <div class="arrow">→</div>
+          <div class="node"><strong>Evidence Store</strong><span>Runs, logs, findings, reports</span></div>
+        </div>
+        <div class="grid-2" style="margin-top:18px;">
+          <div class="card">
+            <h3>Main technical stack</h3>
+            <ul>
+              <li>Python + FastAPI</li>
+              <li>Jinja2 dashboard</li>
+              <li>SQLite evidence storage</li>
+              <li>Rich CLI output</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Why this matters</h3>
+            <ul>
+              <li>Shows both visualization and automation</li>
+              <li>Allows live comparison of vulnerable vs secure results</li>
+              <li>Supports presentation and technical validation together</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div>
+        <div class="eyebrow">Attack Modules</div>
+        <h2>What My Tester Simulates</h2>
+        <div class="grid-3">
+          <div class="card">
+            <h3>Injection</h3>
+            <ul>
+              <li>SQL injection on UDM</li>
+              <li>NoSQL / JSON injection</li>
+              <li>SUPI manipulation</li>
+              <li>Command injection on NEF</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Authorization & identity</h3>
+            <ul>
+              <li>JWT manipulation</li>
+              <li>JWT authentication validation</li>
+              <li>BOLA-style access</li>
+              <li>NRF spoofing attempts</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Advanced context</h3>
+            <ul>
+              <li>OpenAPI-guided fuzzing</li>
+              <li>STRIDE mapping</li>
+              <li>Implementation playbook</li>
+              <li>Reference and lab blueprint panels</li>
+            </ul>
+          </div>
+        </div>
+        <div class="callout" style="margin-top:16px;">
+          <h3>Core idea</h3>
+          <p>The project does not only show the attack. It also shows how a secure implementation should block or contain the same payload.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div>
+        <div class="eyebrow">Dashboard Demo</div>
+        <h2>What I Show Live in the Dashboard</h2>
+        <ol>
+          <li>Introduce the attack surface and the simulated 5G assets.</li>
+          <li>Load a payload such as Command Injection, JSON Injection, or SUPI Injection.</li>
+          <li>Run the attack and compare the vulnerable and secure outputs.</li>
+          <li>Launch a structured scan and open the latest run from the Recent Runs panel.</li>
+          <li>Show the STRIDE, fuzzing, lab blueprint, playbook, and sources sections.</li>
+        </ol>
+        <div class="speaker">
+          <strong>Say this:</strong>
+          “The dashboard gives me a visual way to explain the story: attack surface, attack execution, mitigation, and evidence.”
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div>
+        <div class="eyebrow">CLI Demo</div>
+        <h2>What I Show Live in the CLI</h2>
+        <div class="grid-2">
+          <div class="codebox">
+            <h3>Main scanner CLI</h3>
+            <pre>python main.py --mode scan
+python main.py --mode scan --nf UDM
+python main.py --mode attack --module udm</pre>
+          </div>
+          <div class="codebox">
+            <h3>Structured scan engine CLI</h3>
+            <pre>python scanner_cli.py profiles list
+python scanner_cli.py modules list
+python scanner_cli.py run --profile mock-local-lab --mode dry-run</pre>
+          </div>
+        </div>
+        <div class="speaker">
+          <strong>Say this:</strong>
+          “The CLI proves that my project is not only a dashboard. It also supports structured, modular security testing like a real scanner.”
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div>
+        <div class="eyebrow">Evidence</div>
+        <h2>Evidence and Reporting</h2>
+        <div class="grid-2">
+          <div class="card">
+            <h3>What the platform records</h3>
+            <ul>
+              <li>Attack history from the dashboard runner</li>
+              <li>Structured scan runs with findings</li>
+              <li>Report export data for review and discussion</li>
+              <li>Uploaded scenarios and reusable module outputs</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Why this is useful academically</h3>
+            <ul>
+              <li>Shows repeatable proof instead of only theory</li>
+              <li>Makes vulnerable vs secure behavior easy to compare</li>
+              <li>Supports both visual presentation and command-line validation</li>
+              <li>Creates a stronger viva and report discussion</li>
+            </ul>
+          </div>
+        </div>
+        <div class="callout" style="margin-top:16px;">
+          <h3>Short summary</h3>
+          <p>The platform is designed to generate practical evidence, not only screenshots. That makes the project easier to defend technically and academically.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div>
+        <div class="eyebrow">Conclusion</div>
+        <h2>Final Conclusion</h2>
+        <p class="lead">
+          5G Core security is increasingly API security. Because the core uses microservices and Service-Based Interfaces, weak validation, weak trust assumptions, and weak authorization can become practical security problems.
+        </p>
+        <div class="grid-2">
+          <div class="card">
+            <h3>What the project proves</h3>
+            <ul>
+              <li>5G API risks can be demonstrated clearly</li>
+              <li>Injection and authorization flaws are understandable in a telecom context</li>
+              <li>Secure controls can be shown, not only described</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Future work</h3>
+            <ul>
+              <li>Real integration with free5GC/Open5GS labs</li>
+              <li>mTLS or OAuth2 trust between services</li>
+              <li>PDF export of findings</li>
+              <li>More attack modules and fuzzing coverage</li>
+            </ul>
+          </div>
+        </div>
+        <div class="speaker">
+          <strong>Say this:</strong>
+          “In conclusion, this project combines 5G Core concepts, API security testing, a dashboard, a scanner CLI, and measurable evidence into one coherent platform.”
+        </div>
+        <div class="footer-note">
+          Navigation: <span class="kbd">←</span> previous, <span class="kbd">→</span> next, <span class="kbd">Home</span> first slide, <span class="kbd">End</span> last slide.
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll(".slide"));
+    const progressText = document.getElementById("progressText");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const printBtn = document.getElementById("printBtn");
+    let current = 0;
+
+    function render(index) {
+      current = Math.max(0, Math.min(index, slides.length - 1));
+      slides.forEach((slide, i) => slide.classList.toggle("active", i === current));
+      progressText.textContent = `Slide ${current + 1} / ${slides.length}`;
+      prevBtn.disabled = current === 0;
+      nextBtn.disabled = current === slides.length - 1;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    prevBtn.addEventListener("click", () => render(current - 1));
+    nextBtn.addEventListener("click", () => render(current + 1));
+    printBtn.addEventListener("click", () => window.print());
+
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowRight" || event.key === "PageDown") render(current + 1);
+      if (event.key === "ArrowLeft" || event.key === "PageUp") render(current - 1);
+      if (event.key === "Home") render(0);
+      if (event.key === "End") render(slides.length - 1);
+    });
+
+    render(0);
+  </script>
+</body>
+</html>

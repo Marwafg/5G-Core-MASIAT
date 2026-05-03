@@ -1,0 +1,26 @@
+name: mock-local-lab
+base_url: http://127.0.0.1:8000
+description: Local mock profile powered by the built-in simulated 5G core API flows.
+scope: Local demo profile
+simulate: true
+rate_limit_per_second: 2.0
+timeout_seconds: 5.0
+concurrency: 2
+headers:
+  x-api-key: 5GC-SECURE-2026
+endpoints:
+  - nf: nrf
+    method: GET
+    path: /api/nrf/services
+    description: Discover mock network functions
+    scopes: [nnrf-disc]
+  - nf: udm
+    method: GET
+    path: /api/udm/vulnerable/subscribers
+    description: Simulated subscriber lookup endpoint
+    scopes: [nudm-sdm]
+  - nf: nef
+    method: GET
+    path: /api/nef/vulnerable/diagnostics
+    description: Simulated diagnostics endpoint
+    scopes: [nnef-eventexposure]

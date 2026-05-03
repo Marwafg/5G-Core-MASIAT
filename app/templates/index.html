@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>5G Core Microservice API Security & Injection Attack Tester</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+  <div class="ambient-glow"></div>
+  <div class="dashboard-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 2 20 4.5v6.5c0 4.8-3.1 8.7-8 11-4.9-2.3-8-6.2-8-11V4.5L12 2Z"></path>
+            <path d="M7.4 8.5c2.4-1.8 6.2-2 9.2-.5" class="brand-cut"></path>
+          </svg>
+        </div>
+        <div>
+          <strong>Fortexa</strong>
+          <span>OpenAPI-driven 5G Core API Security Tester</span>
+        </div>
+      </div>
+
+      <nav class="nav-pills">
+        <button type="button" class="nav-pill" data-nav-target="dashboard">
+          <span class="nav-icon grid"></span>
+          Dashboard
+        </button>
+        <button type="button" class="nav-pill" data-nav-target="findings">
+          <span class="nav-icon search-mini"></span>
+          Findings
+        </button>
+        <button type="button" class="nav-pill active" data-nav-target="attack-surface">
+          <span class="nav-icon target"></span>
+          Attack Surface
+        </button>
+        <button type="button" class="nav-pill" data-nav-target="threats">
+          <span class="nav-icon shield-mini"></span>
+          Threats
+        </button>
+      </nav>
+
+      <div class="topbar-actions">
+        <button type="button" class="circle-btn search-icon" aria-label="Search" data-toolbar-action="focus-search"></button>
+        <button type="button" class="circle-btn bell-icon" aria-label="Alerts" data-toolbar-action="toggle-alerts"></button>
+        <button type="button" class="circle-btn gear-icon" aria-label="Settings" data-toolbar-action="toggle-settings"></button>
+        <div class="avatar">SC</div>
+      </div>
+    </header>
+
+    <main class="dashboard-main">
+      <section class="status-strip" id="status-strip">
+        <div class="status-card status-live">
+          <strong id="status-title">Injection Testing on 5G Core APIs</strong>
+          <span id="status-message">This project tests security vulnerabilities in 5G Core microservice APIs using OpenAPI-based discovery and automated injection testing.</span>
+        </div>
+        <div class="status-card is-hidden" id="alerts-panel">
+          <strong>Alerts</strong>
+          <span>Secure policy blocked recent injection indicators. Review the latest run in the attack runner.</span>
+        </div>
+        <div class="status-card is-hidden" id="settings-panel">
+          <strong>Settings</strong>
+          <span>Demo mode active. Secure endpoints use x-api-key and no dashboard data is cached.</span>
+        </div>
+      </section>
+
+      <section class="hero-grid page-section" data-section="attack-surface">
+        <article class="panel surface-panel">
+          <div class="panel-heading">
+            <div>
+              <h2>Your Attack Surface</h2>
+              <p>Live API security metrics from simulated 5G core microservices including NRF, UDM, and NEF.</p>
+            </div>
+            <button type="button" class="ghost-pill" id="time-range-button" data-range-index="0">Daily</button>
+          </div>
+
+          <div class="metric-cards">
+            <article class="metric-card purple">
+              <div class="metric-top">
+                <span class="metric-icon">*</span>
+                <div>
+                  <strong id="total-threats">{{ metrics.attack_runs * 5 + 125 }}%</strong>
+                  <span>API Threat Exposure</span>
+                </div>
+              </div>
+              <div class="spark bars purple-bars">
+                <span></span><span></span><span></span><span></span><span></span><span></span>
+                <span></span><span></span><span></span><span></span><span></span><span></span>
+              </div>
+            </article>
+
+            <article class="metric-card blue">
+              <div class="metric-top">
+                <span class="metric-icon">O</span>
+                <div>
+                  <strong>{{ (metrics.services * 4) + 1 }}%</strong>
+                  <span>OpenAPI Input Risk</span>
+                </div>
+              </div>
+              <div class="spark line blue-line">
+                <svg viewBox="0 0 220 110" preserveAspectRatio="none" aria-hidden="true">
+                  <path d="M0 102 L24 102 L38 90 L80 90 L115 90 L140 80 L156 26 L176 18 L186 20 L220 64"></path>
+                  <path d="M0 104 L40 104 L92 101 L130 92 L160 88 L220 72" class="muted"></path>
+                </svg>
+              </div>
+            </article>
+
+            <article class="metric-card orange">
+              <div class="metric-top">
+                <span class="metric-icon">[]</span>
+                <div>
+                  <strong>{{ (metrics.subscribers * 11) + 2 }}%</strong>
+                  <span>SUPI Injection Risk</span>
+                </div>
+              </div>
+              <div class="spark bars gray-bars">
+                <span></span><span></span><span></span><span></span><span class="accent"></span><span></span>
+                <span></span><span></span><span></span>
+              </div>
+            </article>
+
+            <article class="metric-card pink">
+              <div class="metric-top">
+                <span class="metric-icon">=</span>
+                <div>
+                  <strong>29%</strong>
+                  <span>Schema Fuzz Risk</span>
+                </div>
+              </div>
+              <div class="spark line pink-line">
+                <svg viewBox="0 0 220 110" preserveAspectRatio="none" aria-hidden="true">
+                  <path d="M0 72 C20 58, 42 92, 60 84 S100 40, 120 48 S140 10, 164 26 S198 70, 220 44"></path>
+                  <path d="M0 60 C22 36, 40 84, 66 78 S102 106, 124 94 S156 22, 180 46 S202 72, 220 70" class="muted"></path>
+                </svg>
+              </div>
+            </article>
+          </div>
+        </article>
+
+        <article class="panel score-panel">
+          <div class="panel-heading compact">
+            <div>
+              <h2>Risk Score</h2>
+            </div>
+            <button type="button" class="dots-btn" id="score-cycle-button" aria-label="More">...</button>
+          </div>
+
+          <div class="gauge-wrap">
+            <div class="gauge" id="risk-gauge" style="--score: 70;">
+              {% for i in range(20) %}
+              <span class="gauge-bar"></span>
+              {% endfor %}
+            </div>
+            <div class="gauge-center">
+              <span>Score</span>
+              <strong id="risk-score-value">70%</strong>
+            </div>
+            <div class="gauge-scale">
+              <span>0</span>
+              <span>100</span>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="panel overview-panel page-section" data-section="dashboard">
+        <div class="panel-heading overview-heading">
+          <div>
+            <h2>Attack Surface Overview</h2>
+            <p>Operational view of 5G Core microservice APIs, discovered inputs, and recent injection testing evidence.</p>
+          </div>
+
+          <div class="overview-tools">
+            <label class="search-box">
+              <span class="search-glyph"></span>
+              <input id="table-search" type="search" placeholder="Search">
+            </label>
+            <button type="button" class="circle-btn filter-icon" id="filter-button" aria-label="Filter"></button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="surface-table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Connector</th>
+                <th>Workload</th>
+                <th>Security Score</th>
+                <th>Date</th>
+                <th>Permissions</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="surface-table-body">
+              {% set table_rows = [
+                {"name":"udm-subscriber-db","type":"Core Database","connector":"Azure Sandbox","workload":"Subscriber Query API","score":25,"date":"Apr 12, 2026","permissions":["UD","DB"],"accent":"orange"},
+                {"name":"nef-diagnostics","type":"Exposure API","connector":"AWS Lab","workload":"Ping Diagnostics","score":55,"date":"Apr 14, 2026","permissions":["NE","OS","AP"],"accent":"pink"},
+                {"name":"nrf-registry","type":"Service Discovery","connector":"GCP Edge","workload":"Registry Service","score":43,"date":"Apr 15, 2026","permissions":["NR","AP"],"accent":"blue"},
+                {"name":"pcf-policy-engine","type":"Policy Control","connector":"Sandbox","workload":"Slice Policy Logic","score":70,"date":"Apr 17, 2026","permissions":["PC","NF","AP"],"accent":"purple"},
+                {"name":"amf-session-gateway","type":"Session Mgmt","connector":"CyScale Dev","workload":"Auth Session Broker","score":61,"date":"Apr 18, 2026","permissions":["AM","ID","AU"],"accent":"red"},
+                {"name":"supi-audit-stream","type":"Telemetry","connector":"CyScale GCP","workload":"Attack Log Stream","score":39,"date":"Apr 19, 2026","permissions":["LG","RW"],"accent":"cyan"},
+                {"name":"vulnerable-query-lab","type":"Demo Node","connector":"AWS Sandbox","workload":"SQLi Simulation","score":75,"date":"Apr 21, 2026","permissions":["DB","AP","EX"],"accent":"violet"},
+                {"name":"command-sandbox","type":"Function","connector":"Lab Cluster","workload":"Command Injection Test","score":55,"date":"Apr 22, 2026","permissions":["NE","SH"],"accent":"orange"}
+              ] %}
+              {% for row in table_rows %}
+              <tr data-search="{{ row.name }} {{ row.connector }} {{ row.workload }}" data-score="{{ row.score }}">
+                <td><button type="button" class="checkbox" aria-label="Select row"></button></td>
+                <td>
+                  <div class="identity-cell">
+                    <span class="service-badge {{ row.accent }}"></span>
+                    <div>
+                      <strong>{{ row.name }}</strong>
+                      <span>{{ row.type }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td>{{ row.connector }}</td>
+                <td>
+                  <div class="workload-cell">
+                    <strong>{{ row.workload }}</strong>
+                    <span>Compute | Function</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="score-cell">
+                    <div class="mini-meter" style="--score: {{ row.score }};">
+                      {% for i in range(14) %}
+                      <span></span>
+                      {% endfor %}
+                    </div>
+                    <span>{{ row.score }}%</span>
+                  </div>
+                </td>
+                <td>{{ row.date }}</td>
+                <td>
+                  <div class="permission-list">
+                    {% for permission in row.permissions %}
+                    <span>{{ permission }}</span>
+                    {% endfor %}
+                  </div>
+                </td>
+                <td>
+                  <div class="action-list">
+                    <button type="button" aria-label="Open" data-row-action="open">Open</button>
+                    <button type="button" aria-label="Delete" data-row-action="delete">Hide</button>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <section class="runner-area">
+          <div class="runner-header">
+            <div>
+              <h3>Injection Testing on 5G Core APIs</h3>
+              <p>Run OpenAPI-driven injection tests first, then validate authentication and authorization weaknesses as secondary issues.</p>
+            </div>
+            <div class="api-key-inline">
+              <span>Secure Key</span>
+              <code>5GC-SECURE-2026</code>
+            </div>
+          </div>
+
+          <div class="scanner-controls">
+            <label>
+              Scan Profile
+              <select id="scan-profile">
+                {% for profile in scanner_profiles %}
+                <option value="{{ profile.name }}">{{ profile.name }}</option>
+                {% endfor %}
+              </select>
+            </label>
+            <label>
+              Scan Mode
+              <select id="scan-mode">
+                <option value="dry-run">dry-run</option>
+                <option value="active">active</option>
+              </select>
+            </label>
+            <label>
+              Scanner Modules
+              <select id="scan-modules" multiple>
+                {% for module in scanner_modules %}
+                <option value="{{ module.id }}" {% if module.id in ["json_injection", "api_auth_validation", "object_level_authorization"] %}selected{% endif %}>{{ module.label }}</option>
+                {% endfor %}
+              </select>
+              <small class="field-hint">A presentation-safe starter set is preselected. Hold Ctrl to change the module mix.</small>
+            </label>
+            <div class="scanner-actions">
+              <button type="button" class="ghost-pill" id="run-scan-button">Launch Structured Scan</button>
+              <button type="button" class="ghost-pill" id="refresh-runs-button">Refresh Runs</button>
+            </div>
+          </div>
+
+          <form id="attack-form" class="runner-grid">
+            <label>
+              Attack Vector
+              <select id="attack-vector" name="attack_vector">
+                <option value="sql_injection">SQL Injection on UDM Subscriber API</option>
+                <option value="nosql_injection">NoSQL Injection on NRF or UDM Mongo Queries</option>
+                <option value="command_injection">Command Injection on NEF Diagnostics API</option>
+                <option value="jwt_manipulation">JWT Manipulation Between Network Functions</option>
+                <option value="nrf_spoofing">Service Registration API Abuse</option>
+                <option value="jwt_attack">API Authentication Validation Tester</option>
+                <option value="bola">Object-Level Authorization Tester</option>
+                <option value="json_injection">JSON Injection Testing Module</option>
+                <option value="supi_manipulation">Subscriber Identity Injection Tester</option>
+              </select>
+            </label>
+            <label class="payload-field">
+              Payload
+              <textarea id="payload" name="payload" rows="4">' OR '1'='1' --</textarea>
+            </label>
+            <div class="runner-actions">
+              <button type="button" class="secondary" data-sample="sql">Load SUPI SQLi</button>
+              <button type="button" class="secondary" data-sample="nosql">Load JSON NoSQL</button>
+              <button type="button" class="secondary" data-sample="cmd">Load Command Sample</button>
+              <button type="button" class="secondary" data-sample="jwt">Load JWT Sample</button>
+              <button type="button" class="secondary" data-sample="nrf">Load NRF Abuse</button>
+              <button type="button" class="secondary" data-sample="bola">Load BOLA Sample</button>
+              <button type="button" class="secondary" data-sample="json">Load JSON Injection</button>
+              <button type="button" class="secondary" data-sample="supi">Load SUPI Injection</button>
+              <button type="submit">Run Injection Test</button>
+            </div>
+          </form>
+
+          <div class="runner-footer">
+            <div class="runner-sidebar">
+              <div id="history" class="history-chips">
+                {% for log in logs %}
+                <article class="history-chip">
+                  <strong>{{ log.attack_vector }}</strong>
+                  <span>{{ log.risk_score }} risk</span>
+                </article>
+                {% else %}
+                <p class="empty-state">No attack runs yet. Start with a sample payload.</p>
+                {% endfor %}
+              </div>
+
+              <div class="runs-panel">
+                <div class="panel-heading compact">
+                  <div>
+                    <h2>Recent Runs</h2>
+                    <p>Structured scan summaries generated by the shared engine.</p>
+                  </div>
+                </div>
+                <div id="runs-list" class="history-chips">
+                  {% for run in recent_runs %}
+                  <article class="history-chip">
+                    <strong>{{ run.profile_name }}</strong>
+                    <span>{{ run.mode }} | {{ run.findings_count }} findings</span>
+                  </article>
+                  {% else %}
+                  <p class="empty-state">No structured scans yet. Launch one from the controls above.</p>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+            <pre id="result" class="result-card empty">Select a payload and run the tester to compare vulnerable versus secure behavior.</pre>
+          </div>
+        </section>
+      </section>
+
+      <section class="insight-grid page-section" data-section="findings">
+        <article class="panel insight-panel">
+          <div class="panel-heading compact">
+            <div>
+              <h2>5G Attack Catalog</h2>
+              <p>API-focused testing modules for injection, authentication, authorization, and registration abuse.</p>
+            </div>
+            <button type="button" class="ghost-pill" id="refresh-catalog-button">Refresh Catalog</button>
+          </div>
+          <div id="catalog-list" class="stride-list">
+            {% for item in attack_catalog %}
+            <article class="stride-item">
+              <strong>{{ item.title }}</strong>
+              <span>{{ item.goal }}</span>
+            </article>
+            {% endfor %}
+          </div>
+        </article>
+
+        <article class="panel insight-panel">
+          <div class="panel-heading compact">
+            <div>
+              <h2>STRIDE Threat Model</h2>
+              <p>Attack vectors mapped to 5G API security categories with injection testing at the center.</p>
+            </div>
+          </div>
+          <div class="stride-list">
+            {% for item in stride_items %}
+            <article class="stride-item">
+              <strong>{{ item.category }}</strong>
+              <span>{{ item.vector }}</span>
+            </article>
+            {% endfor %}
+          </div>
+        </article>
+
+        <article class="panel insight-panel">
+          <div class="panel-heading compact">
+            <div>
+              <h2>OpenAPI Fuzzing</h2>
+              <p>Malformed inputs generated directly from 3GPP-style OpenAPI schemas and discovered API parameters.</p>
+            </div>
+            <button type="button" class="ghost-pill" id="refresh-fuzz-button">Refresh Fuzz</button>
+          </div>
+          <div id="fuzz-list" class="fuzz-list">
+            {% for item in fuzz_payloads %}
+            <article class="fuzz-item">
+              <strong>{{ item.attack_type }}</strong>
+              <span>{{ item.method }} {{ item.path }}</span>
+            </article>
+            {% endfor %}
+          </div>
+        </article>
+      </section>
+
+      <section class="insight-grid page-section" data-section="threats">
+        <article class="panel insight-panel">
+          <div class="panel-heading compact">
+            <div>
+              <h2>Lab Blueprint</h2>
+              <p>Contained Docker, Kubernetes, or VM environment for realistic 5G core API testing.</p>
+            </div>
+            <button type="button" class="ghost-pill" id="show-lab-button">Show Lab</button>
+          </div>
+          <pre id="lab-output" class="result-card empty">Open5GS/free5GC + UERANSIM + Mitmproxy + Docker or Kubernetes.</pre>
+        </article>
+
+        <article class="panel insight-panel">
+          <div class="panel-heading compact">
+            <div>
+              <h2>OAuth 2.0 / JWT Check</h2>
+              <p>Secondary validation module for NF-to-NF JWT robustness after the injection tests.</p>
+            </div>
+            <button type="button" class="ghost-pill" id="verify-jwt-button">Verify JWT</button>
+          </div>
+          <pre id="jwt-output" class="result-card empty">Generate a sample NF token and verify a tampered admin-role variant.</pre>
+        </article>
+      </section>
+
+      <section class="insight-grid">
+        <article class="panel insight-panel">
+          <div class="panel-heading compact">
+            <div>
+              <h2>5G Core Attack Simulator Upload</h2>
+              <p>Upload API test scenarios, replay inputs, or microservice interaction traces for the injection tester.</p>
+            </div>
+          </div>
+          <form id="upload-form" class="upload-form">
+            <input id="simulator-file" type="file" name="file" accept=".json,.yaml,.yml,.txt,.pcap,.har">
+            <button type="submit" class="ghost-pill">Upload Simulator</button>
+          </form>
+          <pre id="upload-output" class="result-card empty">Choose a simulator scenario file to upload it into the lab workspace.</pre>
+        </article>
+      </section>
+
+      <section class="insight-grid">
+        <article class="panel insight-panel insight-panel-wide">
+          <div class="panel-heading compact">
+            <div>
+              <h2>Implementation Playbook</h2>
+              <p>Integrated lab, OpenAPI discovery, interception, injection payloads, reporting, and standards guidance.</p>
+            </div>
+            <button type="button" class="ghost-pill" id="show-playbook-button">Show Playbook</button>
+          </div>
+          <div id="playbook-list" class="playbook-list">
+            {% for section in playbook_sections %}
+            <article class="playbook-item">
+              <strong>{{ section.title }}</strong>
+              <span>{{ section.summary }}</span>
+            </article>
+            {% endfor %}
+          </div>
+          <pre id="playbook-output" class="result-card empty">The integrated implementation playbook will appear here with detailed steps and controls.</pre>
+        </article>
+      </section>
+
+      <section class="insight-grid">
+        <article class="panel insight-panel insight-panel-wide">
+          <div class="panel-heading compact">
+            <div>
+              <h2>Research Sources & Best Practices</h2>
+              <p>Specifications, OWASP guidance, open-source docs, and 5G API security research supporting this framework.</p>
+            </div>
+            <button type="button" class="ghost-pill" id="show-sources-button">Show Sources</button>
+          </div>
+          <div id="sources-list" class="playbook-list">
+            {% for source in reference_sources %}
+            <article class="playbook-item">
+              <strong>{{ source.title }}</strong>
+              <span>{{ source.summary }}</span>
+            </article>
+            {% endfor %}
+          </div>
+          <pre id="sources-output" class="result-card empty">Sources and best-practice references will appear here for your report and presentation.</pre>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

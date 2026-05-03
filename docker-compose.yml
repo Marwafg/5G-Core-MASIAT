@@ -1,0 +1,25 @@
+services:
+  5gc-security-lab:
+    build: .
+    container_name: 5gc-security-lab
+    ports:
+      - "8000:8000"
+    environment:
+      APP_ENV: production
+      APP_HOST: 0.0.0.0
+      APP_PORT: 8000
+      APP_VERSION: 1.1.0
+      DEMO_API_KEY: 5GC-SECURE-2026
+      DB_PATH: /data/core_security_lab.db
+      LOG_LEVEL: INFO
+    volumes:
+      - 5gc_security_lab_data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready')"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  5gc_security_lab_data:
