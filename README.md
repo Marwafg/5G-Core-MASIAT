@@ -1,4 +1,4 @@
-# 5G Core Microservice API Security & Injection Attack Tester (OpenAPI-driven)
+# 5G Core Microservice API Security & Injection Attack Tester
 
 This project is an **OpenAPI-driven 5G Core microservice API security platform** that focuses on **injection vulnerabilities and authorization flaws** in service-based interfaces.
 
