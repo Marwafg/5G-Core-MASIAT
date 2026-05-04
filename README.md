@@ -1,205 +1,393 @@
-# 5G Core Microservice API Security & Injection Attack Tester
+# 5G Core MASIAT
 
-This project is an **OpenAPI-driven 5G Core microservice API security platform** that focuses on **injection vulnerabilities and authorization flaws** in service-based interfaces.
+5G Core MASIAT is a **5G Core API security testing platform** built for demonstrating **injection vulnerabilities, authentication weaknesses, and authorization flaws** in Service-Based Interfaces (SBI).
 
-Official intro:
+It combines:
 
-> This project focuses on testing security vulnerabilities in 5G Core microservice APIs, specifically injection attacks and authorization flaws, using OpenAPI-based discovery and automated testing.
+- a **FastAPI dashboard** for live demonstrations
+- a **scanner API** for structured runs
+- a **scanner CLI** for command-line operation
+- a **modular checks / attacks layer** inspired by telecom security workflows
+- **evidence storage and reports** for findings, run history, and demo output
 
-Instead of showing security only in theory, the project gives a side-by-side comparison:
+The project is designed for academic demonstrations, practical security labs, and explaining how **vulnerable** and **secure** API behavior differ inside a 5G Core context.
 
-- **Vulnerable APIs** that use unsafe patterns such as SQL string concatenation, unvalidated JSON merging, or weak token handling.
-- **Secure APIs** that apply API authentication checks, allowlist validation, parameterized queries, and authorization controls.
-- **An OpenAPI-driven attack runner dashboard** that discovers inputs and executes API security tests visually.
+## What This Project Demonstrates
 
-## Why This Project Stands Out
+- SQL-style injection on subscriber lookups
+- NoSQL / JSON injection behavior
+- SUPI manipulation scenarios
+- command injection simulation on diagnostics flows
+- JWT manipulation and token verification
+- BOLA-style object access issues
+- NRF registration / spoofing logic
+- OpenAPI-guided fuzz input generation
+- structured scan runs with saved findings
 
-- It uses real 5G-core-inspired components: **NRF**, **UDM**, and **NEF**.
-- It demonstrates both **API security** and **automated injection testing** in one polished app.
-- It includes a clean UI for live presentations and viva demonstrations.
-- It records attack history so you can show measurable testing evidence.
-- It is **specification-driven**, using OpenAPI concepts rather than random payload guessing.
+## Main 5G-Inspired Components
 
-## Architecture
+- **NRF**: service discovery and registration
+- **UDM**: subscriber lookup and data access
+- **NEF**: exposed diagnostics / service logic
+- **AUSF / PCF / AMF / SMF**: scanner-side modules for broader telecom-style workflows
 
-### Simulated 5G Core Services
+## Project Architecture
 
-- **NRF**: service registry where microservices are listed.
-- **UDM**: subscriber data management API used for lookup operations.
-- **NEF**: network exposure API used for diagnostics.
+There are two main usage paths:
 
-### Security Focus
+1. **Dashboard path**
+   - Open the web UI
+   - run attacks interactively
+   - review secure vs vulnerable outputs
+   - view fuzzing, lab blueprint, sources, and playbook
 
-- OpenAPI-based input discovery.
-- JSON and SUPI injection testing.
-- API authentication validation through JWT-focused checks.
-- Object-level authorization testing.
-- Payload evaluation with risk scoring and attack indicators.
+2. **Scanner path**
+   - launch structured scans from the dashboard or CLI
+   - run modular checks and attack modules
+   - export JSON reports and network-map-style output
 
-## Main Features
-
-1. **Dashboard UI**
-   - Presents service health, API risk metrics, recent test evidence, and the testing lab.
-2. **JSON / NoSQL Injection Testing**
-   - Tests JSON-based APIs with payloads such as `{"supi":{"$ne": null}}`.
-3. **SUPI Injection Testing**
-   - Simulates injection against subscriber identity fields such as `"supi": "' OR 1=1 --"`.
-4. **OpenAPI-Guided Fuzzing**
-   - Parses a 3GPP-style SBI spec and generates malformed payloads automatically.
-5. **API Authentication Validation**
-   - Tests JWT robustness, tampered claims, and NF-to-NF token validation behavior.
-6. **Object-Level Authorization Testing**
-   - Demonstrates BOLA-style access to unauthorized subscriber or NF objects.
-7. **Presentation-Friendly Design**
-   - Strong narrative for explaining API security, exploit path, and mitigation.
-
-## Project Structure
+## Repository Structure
 
 ```text
-app/
-  main.py
-  database.py
-  security.py
-  schemas.py
-  routers/
-    dashboard.py
-    nef.py
-    nrf.py
-    tester.py
-    udm.py
-  static/
-    css/styles.css
-    js/app.js
-  templates/
-    index.html
-tests/
-  test_security_lab.py
-requirements.txt
-README.md
+5G-Core-MASIAT/
+├─ app/
+│  ├─ main.py
+│  ├─ config.py
+│  ├─ database.py
+│  ├─ schemas.py
+│  ├─ security.py
+│  ├─ telecom_security.py
+│  ├─ data/
+│  ├─ routers/
+│  │  ├─ analysis.py
+│  │  ├─ dashboard.py
+│  │  ├─ nef.py
+│  │  ├─ nrf.py
+│  │  ├─ scanner.py
+│  │  ├─ tester.py
+│  │  └─ udm.py
+│  ├─ static/
+│  │  ├─ css/styles.css
+│  │  └─ js/app.js
+│  └─ templates/
+│     └─ index.html
+├─ analyzer/
+│  └─ response.py
+├─ checks/
+│  ├─ base_check.py
+│  ├─ compat.py
+│  ├─ amf/
+│  ├─ ausf/
+│  ├─ nrf/
+│  ├─ oauth/
+│  ├─ pcf/
+│  ├─ smf/
+│  └─ udm/
+├─ attacks/
+│  ├─ base_attack.py
+│  ├─ ausf/
+│  ├─ nrf/
+│  ├─ pcf/
+│  └─ udm/
+├─ core/
+│  ├─ database.py
+│  ├─ models.py
+│  ├─ payload_loader.py
+│  └─ scanner_engine.py
+├─ config/
+│  └─ profiles/
+├─ report/
+│  ├─ reporter.py
+│  ├─ visualizer.py
+│  ├─ report.json
+│  ├─ attack_report.json
+│  └─ network_map.html
+├─ docs/
+│  ├─ 5g_project_presentation.html
+│  ├─ 5g_project_demo_guide.pdf
+│  └─ REAL_5G_LAB_BLUEPRINT.md
+├─ uploads/
+├─ tests/
+│  └─ test_security_lab.py
+├─ main.py
+├─ scanner_cli.py
+├─ config.py
+├─ requirements.txt
+└─ README.md
 ```
 
-## How To Run
+## Requirements
 
-### 1. Install dependencies
+- Python 3.10+ recommended
+- Windows, Linux, or WSL
+
+Install dependencies:
 
 ```bash
 python -m pip install -r requirements.txt
 ```
 
-### 2. Start the app
+## How To Run
+
+### Option 1: Run the dashboard
+
+From the project root:
 
 ```bash
 python -m uvicorn app.main:app --reload
 ```
 
-### 3. Open the dashboard
-
-Visit:
+Then open:
 
 ```text
 http://127.0.0.1:8000
 ```
 
-## Docker Deployment
-
-Run the full application in a container:
+### Option 2: Run the class-style scanner CLI
 
 ```bash
-docker compose up --build
+python main.py --mode scan
+python main.py --mode scan --nf UDM
+python main.py --mode attack --module udm
 ```
 
-The app will be available at:
+### Option 3: Run the structured scanner CLI
 
-```text
-http://127.0.0.1:8000
+```bash
+python scanner_cli.py profiles list
+python scanner_cli.py modules list
+python scanner_cli.py run --profile mock-local-lab --mode dry-run
+python scanner_cli.py run --profile mock-local-lab --mode active
 ```
 
-Useful operational endpoints:
+## Dashboard Features
 
-- `GET /health`
-- `GET /health/ready`
-- `GET /api/tester/report`
+The dashboard includes:
 
-## Demo API Key
+- **Attack Surface** overview
+- **interactive attack runner**
+- **structured scan launcher**
+- **recent runs** viewer
+- **attack catalog**
+- **OpenAPI fuzz payload generation**
+- **lab blueprint**
+- **JWT verification**
+- **implementation playbook**
+- **research sources**
+- **scenario upload**
 
-Use this header for secure endpoints:
-
-```text
-x-api-key: 5GC-SECURE-2026
-```
-
-## Important API Endpoints
-
-### Dashboard and overview
+### Main dashboard routes
 
 - `GET /`
 - `GET /api/overview`
 
-### NRF
+### Security testing routes
 
-- `GET /api/nrf/services`
-- `POST /api/nrf/services` (secure)
-
-### UDM subscriber lookup
-
-- `GET /api/udm/vulnerable/subscribers?q=...`
-- `GET /api/udm/secure/subscribers?q=...` (secure)
-
-### NEF diagnostics
-
-- `GET /api/nef/vulnerable/diagnostics?target=...`
-- `GET /api/nef/secure/diagnostics?target=...` (secure)
-
-### Attack runner
-
-- `GET /api/tester/payloads`
 - `POST /api/tester/run`
+- `GET /api/tester/payloads`
 - `GET /api/tester/report`
+- `POST /api/tester/upload`
 
-### Security analysis
+### Analysis routes
 
 - `GET /api/analysis/lab`
+- `GET /api/analysis/catalog`
+- `GET /api/analysis/playbook`
+- `GET /api/analysis/sources`
 - `GET /api/analysis/stride`
 - `GET /api/analysis/openapi`
 - `GET /api/analysis/fuzz`
 - `GET /api/analysis/oauth/sample`
 - `POST /api/analysis/oauth/verify`
 
-## Suggested Presentation Flow
+### Scanner routes
 
-1. Introduce the project as **Injection Testing on 5G Core APIs**.
-2. Show OpenAPI parsing and explain that the attack surface is extracted automatically.
-3. Run the primary tests:
-   - JSON injection
-   - SUPI injection
-   - OpenAPI-guided fuzzing
-4. Then show secondary vulnerabilities:
-   - JWT misuse
-   - BOLA
-5. Explain the mitigations:
-   - schema validation
-   - parameterized queries
-   - API authentication validation
-   - object-level authorization checks
-6. End with the dashboard history and risk scoring to show measurable API security testing.
+- `GET /api/scanner/profiles`
+- `GET /api/scanner/modules`
+- `GET /api/scanner/runs`
+- `GET /api/scanner/runs/{run_id}`
+- `GET /api/scanner/audit`
+- `POST /api/scanner/run`
+
+## Demo API Key
+
+Some secure flows expect:
+
+```text
+x-api-key: 5GC-SECURE-2026
+```
+
+## Demo Flow
+
+This is the recommended live demonstration order.
+
+### 1. Start the application
+
+```bash
+cd D:\5G-Core-MASIAT
+python -m uvicorn app.main:app --reload
+```
+
+### 2. Open the dashboard
+
+Open:
+
+```text
+http://127.0.0.1:8000
+```
+
+### 3. Introduce the project
+
+Suggested line:
+
+> My project is a 5G Core API security testing platform. It demonstrates how vulnerable and secure microservice APIs behave under injection, authentication, and authorization attacks.
+
+### 4. Explain the 5G Core focus
+
+Suggested line:
+
+> I focus on Service-Based Interfaces inside the 5G Core, especially APIs inspired by NRF, UDM, and NEF.
+
+### 5. Show the Attack Surface section
+
+Explain that it gives:
+
+- simulated 5G asset visibility
+- API exposure indicators
+- security risk metrics
+
+### 6. Run the first live dashboard attack
+
+Best first choice:
+
+- `Load Command Sample`
+- `Run Injection Test`
+
+Explain:
+
+> The vulnerable path shows unsafe command construction, while the secure path blocks malicious input.
+
+### 7. Run a second dashboard attack
+
+Best options:
+
+- `Load SUPI Injection`
+- `Load JSON Injection`
+
+Explain:
+
+> This demonstrates how subscriber-related or JSON-based input can affect weak API logic while the secure implementation validates and blocks it.
+
+### 8. Show structured scanning
+
+- keep the default selected modules
+- click `Launch Structured Scan`
+- open `Recent Runs`
+
+Explain:
+
+> Structured scan mode launches multiple predefined checks and stores the findings as formal scan evidence.
+
+### 9. Show the analysis sections
+
+Use:
+
+- `Refresh Catalog`
+- `Refresh Fuzz`
+- `Show Lab`
+- `Verify JWT`
+- `Show Playbook`
+- `Show Sources`
+
+Explain that these connect the practical testing workflow to:
+
+- OpenAPI discovery
+- lab deployment logic
+- token security
+- implementation guidance
+- research references
+
+### 10. Switch to the CLI
+
+```bash
+python main.py --mode scan
+python main.py --mode scan --nf UDM
+python main.py --mode attack --module udm
+```
+
+Then show the structured engine:
+
+```bash
+python scanner_cli.py profiles list
+python scanner_cli.py run --profile mock-local-lab --mode dry-run
+```
+
+## Reports and Evidence
+
+This project stores evidence in the local database and report files.
+
+Generated report artifacts include:
+
+- [report/report.json](D:/5G-Core-MASIAT/report/report.json)
+- [report/attack_report.json](D:/5G-Core-MASIAT/report/attack_report.json)
+- [report/network_map.html](D:/5G-Core-MASIAT/report/network_map.html)
+
+Useful output areas:
+
+- dashboard result panel
+- dashboard attack history
+- recent structured runs
+- exported JSON reports
+
+## Documentation Assets
+
+Presentation and demo materials:
+
+- [docs/5g_project_presentation.html](D:/5G-Core-MASIAT/docs/5g_project_presentation.html)
+- [docs/5g_project_demo_guide.pdf](D:/5G-Core-MASIAT/docs/5g_project_demo_guide.pdf)
+- [docs/REAL_5G_LAB_BLUEPRINT.md](D:/5G-Core-MASIAT/docs/REAL_5G_LAB_BLUEPRINT.md)
 
 ## Testing
 
-Run:
+Run the automated test suite:
 
 ```bash
 python -m pytest
 ```
 
-## Future Enhancements
+## Docker
 
-- Add JWT or OAuth2 for service-to-service trust.
-- Add rate limiting and API gateway policies.
-- Extend the lab with XSS, SSRF, or broken access control cases.
-- Export attack reports as PDF for instructors.
+Build and run with Docker Compose:
 
-## Academic Framing
+```bash
+docker compose up --build
+```
 
-If you want to describe the project in one sentence:
+Then open:
 
-> Unlike traditional security tools, our platform focuses specifically on injection vulnerabilities in 5G Core APIs by leveraging OpenAPI specifications and simulating realistic microservice interactions.
+```text
+http://127.0.0.1:8000
+```
+
+## Practical Notes
+
+- This project is designed as a **contained academic security lab**
+- it demonstrates realistic API security logic without requiring a live production 5G Core
+- it is suitable for:
+  - viva demonstrations
+  - lab reports
+  - secure vs vulnerable comparisons
+  - scanner workflow demonstrations
+
+## Future Improvements
+
+- integrate with real free5GC or Open5GS traffic
+- add stronger OAuth2 or mTLS service-to-service trust
+- expand fuzzing coverage
+- improve PDF / report export
+- add more telecom-specific attack modules
+
+## One-Sentence Summary
+
+> 5G Core MASIAT is a practical platform for demonstrating how API vulnerabilities can affect 5G Core microservices and how secure controls can detect, block, and explain those attacks.
+
